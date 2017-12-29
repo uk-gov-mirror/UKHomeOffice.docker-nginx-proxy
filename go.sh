@@ -56,7 +56,7 @@ fi
 
 NGIX_SYSDIG_SERVER_CONF="${NGIX_CONF_DIR}/nginx_sysdig_server.conf"
 touch ${NGIX_SYSDIG_SERVER_CONF}
-if [ -n "${DISABLE_SYSDIG_METRICS:-}" ]; then
+if [ -z "${DISABLE_SYSDIG_METRICS:-}" ]; then
     cat > ${NGIX_SYSDIG_SERVER_CONF} <<-EOF-SYSDIG-SERVER
     server {
       listen 10088;
