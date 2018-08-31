@@ -170,9 +170,9 @@ done
 
 if [ "${ENABLE_WEB_SOCKETS}" == "TRUE" ]; then
     msg "Enable web socket support"
-    WEB_SOCKETS="include ${NGIX_CONF_DIR}/nginx_web_sockets_proxy.conf;"
+    CONNECTION_CONFIG="include ${NGIX_CONF_DIR}/nginx_web_sockets_proxy.conf;"
 else
-    unset WEB_SOCKETS
+    CONNECTION_CONFIG="include ${NGIX_CONF_DIR}/nginx_keep_alive.conf;"
 fi
 if [ "${ADD_NGINX_LOCATION_CFG}" != "" ]; then
     msg "Enabling extra ADD_NGINX_LOCATION_CFG:${ADD_NGINX_LOCATION_CFG}"
@@ -219,7 +219,7 @@ location ${LOCATION} {
 
     include  ${NAXSI_LOCATION_RULES}/*.rules ;
 
-    ${WEB_SOCKETS}
+    ${CONNECTION_CONFIG}
     $(cat /location_template.conf)
     ${SSL_CERTIFICATE}
     ${SSL_VERIFY}
