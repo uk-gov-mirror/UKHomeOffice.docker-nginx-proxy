@@ -556,6 +556,18 @@ echo "Testing no logging of url params option works..."
 docker logs "${MOCKSERVER}" | grep 'Nginxid:'
 docker logs ${INSTANCE} | grep '"nginx_uuid": "'
 
+start_test "Test UUID header logging option passes through supplied value..." "${STD_CMD} \
+           --log-driver json-file \
+           -e \"PROXY_SERVICE_HOST=http://${MOCKSERVER}\" \
+           -e \"PROXY_SERVICE_PORT=${MOCKSERVER_PORT}\" \
+           -e \"DNSMASK=TRUE\" \
+           -e \"ENABLE_UUID_PARAM=HEADER\" \
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
+curl -sk -H "nginxId: 00000000-1111-2222-3333-444455556666" https://${DOCKER_HOST_NAME}:${PORT}
+echo "Testing no logging of url params option works..."
+docker logs "${MOCKSERVER}" | grep 'Nginxid:00000000-1111-2222-3333-444455556666'
+docker logs ${INSTANCE} | grep '"nginx_uuid": "00000000-1111-2222-3333-444455556666"'
+
 start_test "Test setting UUID name works..." "${STD_CMD} \
            --log-driver json-file \
            -e \"PROXY_SERVICE_HOST=http://${MOCKSERVER}\" \

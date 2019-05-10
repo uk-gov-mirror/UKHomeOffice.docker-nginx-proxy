@@ -42,7 +42,7 @@ cat > ${NGIX_LISTEN_CONF} <<-EOF-LISTEN
 		listen localhost:${INTERNAL_LISTEN_PORT} ssl;
 EOF-LISTEN
 
-if [ "${CUSTOM_SECURITY_DEFAULTS}" == "TRUE" ]; then
+if [ "${CUSTOM_SECURITY_DEFAULTS:-}" == "TRUE" ]; then
     msg "Disabling inbuilt security headers add per location"
     > /usr/local/openresty/nginx/conf/security_defaults.conf
 fi
@@ -70,7 +70,7 @@ fi
 
 NGIX_SYSDIG_SERVER_CONF="${NGIX_CONF_DIR}/nginx_sysdig_server.conf"
 touch ${NGIX_SYSDIG_SERVER_CONF}
-if [ -z ${DISABLE_SYSDIG_METRICS+x} ]; then
+if [ -n "${DISABLE_SYSDIG_METRICS:-}" ]; then
     cat > ${NGIX_SYSDIG_SERVER_CONF} <<-EOF-SYSDIG-SERVER
     server {
       listen 10088;
