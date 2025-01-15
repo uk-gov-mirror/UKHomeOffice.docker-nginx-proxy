@@ -1,1 +1,3 @@
-<!--#include file="50x.shtml" -->
+<!--#set var="title" value="Too Many Requests" -->
+<!--#set var="partial" value="429" -->
+<!--#include file="429.html" -->
