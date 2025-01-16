@@ -1,4 +1,4 @@
-FROM quay.io/ukhomeofficedigital/centos-base:v8.0
+FROM openresty/openresty:1.21.4.1-0-bullseye-fat
 
 ARG GEOIP_ACCOUNT_ID
 ARG GEOIP_LICENSE_KEY
