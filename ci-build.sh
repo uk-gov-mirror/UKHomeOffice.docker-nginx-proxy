@@ -122,11 +122,11 @@ start_test "Start with minimal settings" "${STD_CMD} \
            -e \"PROXY_SERVICE_PORT=443\""
 
 echo "Test it's up and working..."
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 echo "Test limited protcol and SSL cipher... "
-docker run --link ${INSTANCE}:${INSTANCE}--rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -cipher 'AES256+EECDH' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
+docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -cipher 'AES256+EECDH' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
 echo "Test sslv2 not accepted...."
-if docker run --link ${INSTANCE}:${INSTANCE}--rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -ssl2 -connect ${INSTANCE}:10443" &> /dev/null; then
+if docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -ssl2 -connect ${INSTANCE}:10443" &> /dev/null; then
   echo "FAIL SSL defaults settings allow ssl2 ......"
   exit 2
 fi
@@ -151,7 +151,7 @@ start_test "Test GEODB settings can reject..." "${STD_CMD} \
            -e \"ADD_NGINX_LOCATION_CFG=error_page 403 /nginx-proxy/50x.shtml;\" \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test GeoIP config IS rejected..."
-if ! curl -v -k -H "X-Forwarded-For: 1.1.1.1" https://${DOCKER_HOST_NAME}:${PORT}/ 2>&1 \/ | grep '403 Forbidden' ; then
+if ! curl -v -k -H "X-Forwarded-For: 8.8.8.8" https://${DOCKER_HOST_NAME}:${PORT}/ 2>&1 \/ | grep '403 Forbidden' ; then
   echo "We were expecting to be rejected with 403 error here - we are not in the Congo!"
   exit 2
 else
@@ -224,8 +224,7 @@ start_test "Start we auto add a protocol " "${STD_CMD} \
            -e \"PROXY_SERVICE_PORT=80\""
 
 echo "Test it works if we do not define the protocol.."
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/
-
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 
 start_test "Start with multi locations settings" "${STD_CMD} \
            -e \"LOCATIONS_CSV=/,/wiki/Wikipedia:About\" \
@@ -236,9 +235,9 @@ start_test "Start with multi locations settings" "${STD_CMD} \
 
 
 echo "Test for location 1 @ /..."
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 echo "Test for wikipedia about page..."
-wget -O /dev/null --quiet --no-check-certificate --header="Host: en.wikipedia.org" https://${DOCKER_HOST_NAME}:${PORT}/wiki/Wikipedia:About
+curl -sk -o /dev/null -H "Host: en.wikipedia.org" https://${DOCKER_HOST_NAME}:${PORT}/wiki/Wikipedia:About
 
 start_test "Start with Multiple locations, single proxy and NAXSI download." "${STD_CMD} \
            -e \"PROXY_SERVICE_HOST=https://en.wikipedia.org\" \
@@ -248,7 +247,7 @@ start_test "Start with Multiple locations, single proxy and NAXSI download." "${
            -e \"NAXSI_RULES_MD5_CSV_1=3b3c24ed61683ab33d8441857c315432\""
 
 echo "Test for all OK..."
-wget -O /dev/null --quiet --no-check-certificate --header="Host: en.wikipedia.org" https://${DOCKER_HOST_NAME}:${PORT}/
+curl -sk -o /dev/null -H "Host: en.wikipedia.org" https://${DOCKER_HOST_NAME}:${PORT}/
 
 echo "Test client certs..."
 cd ./client_certs/
@@ -265,19 +264,20 @@ start_test "Start with Client CA, and single proxy. Block unauth for /standards"
            -e \"CLIENT_CERT_REQUIRED_2=TRUE\" "
 
 echo "Test access OK for basic area..."
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 
 echo "Test access denied for /standards/..."
-if wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/standards/ ; then
+if curl -sk -o /dev/null --fail https://${DOCKER_HOST_NAME}:${PORT}/standards/ ; then
     echo "Error - expecting auth fail!"
     exit 1
 else
     echo "Passed auth fail"
 fi
 echo "Test access OK for /standards/... with client cert..."
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/standards/ \
-     --certificate=./client_certs/client.crt \
-     --private-key=./client_certs/client.key
+curl -sk -o /dev/null \
+     --cert ./client_certs/client.crt \
+     --key ./client_certs/client.key \
+     https://${DOCKER_HOST_NAME}:${PORT}/standards/
 
 echo "Test upstream client certs..."
 docker build -t mutual-tls:latest ${WORKDIR} -f docker-config/Dockerfile.mutual-tls
@@ -301,7 +301,7 @@ start_test "Start with upstream client certs" \
            --link \"${MUTUAL_TLS}:${MUTUAL_TLS}\" "
 
 echo "Test it's up and working..."
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 tear_down_container "${MUTUAL_TLS}"
 
 echo "Test failure to verify upstream server cert..."
@@ -365,8 +365,8 @@ start_test "Start with Custom error pages redirect off" "${STD_CMD} \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test All ok..."
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/api/
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/api/
 if curl -v -k https://${DOCKER_HOST_NAME}:${PORT}/api/dead | grep "Oh dear" ; then
     echo "Passed return text on error with ERROR_REDIRECT_CODES"
 else
@@ -431,7 +431,7 @@ start_test "Start with listen for port 80" "${STD_CMD} \
            -e \"HTTPS_REDIRECT_PORT=${PORT}\" \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test Redirect ok..."
-wget -O /dev/null --quiet --no-check-certificate http://${DOCKER_HOST_NAME}:8888/
+curl -s -o /dev/null http://${DOCKER_HOST_NAME}:8888/
 
 
 start_test "Test text logging format..." "${STD_CMD} \
@@ -442,7 +442,7 @@ start_test "Test text logging format..." "${STD_CMD} \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test request (with logging as text)..."
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 echo "Testing text logs format..."
 docker logs ${INSTANCE} | grep "\"GET / HTTP/1.1\" 200"
 
@@ -453,7 +453,7 @@ start_test "Test json logging format..." "${STD_CMD} \
            -e \"LOG_FORMAT_NAME=json\" \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}?animal=cow
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}?animal=cow
 echo "Testing json logs format..."
 docker logs ${INSTANCE}  | grep '{"proxy_proto_address":'
 docker logs ${INSTANCE}  | grep 'animal=cow'
@@ -467,7 +467,7 @@ start_test "Test param logging off option works..." "${STD_CMD} \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            -e \"NO_LOGGING_URL_PARAMS=TRUE\" \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}?animal=cow
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}?animal=cow
 echo "Testing no logging of url params option works..."
 docker logs ${INSTANCE} 2>/dev/null | grep '{"proxy_proto_address":'
 docker logs ${INSTANCE} 2>/dev/null | grep 'animal=cow' | wc -l | grep 0
@@ -479,7 +479,7 @@ start_test "Test ENABLE_WEB_SOCKETS..." "${STD_CMD} \
            -e \"ENABLE_WEB_SOCKETS=TRUE\" \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
-wget -O /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/
+curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 
 start_test "Test ADD_NGINX_LOCATION_CFG param..." "${STD_CMD} \
            -e \"PROXY_SERVICE_HOST=http://${MOCKSERVER}\" \
@@ -490,7 +490,7 @@ start_test "Test ADD_NGINX_LOCATION_CFG param..." "${STD_CMD} \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test extra param works"
-wget  -O - -o /dev/null --quiet --no-check-certificate https://${DOCKER_HOST_NAME}:${PORT}/wow | grep "NICE"
+curl -sk https://${DOCKER_HOST_NAME}:${PORT}/wow | grep "NICE"
 
 
 start_test "Test UUID GET param logging option works..." "${STD_CMD} \
@@ -523,7 +523,7 @@ start_test "Test UUID header logging option works..." "${STD_CMD} \
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 curl -sk https://${DOCKER_HOST_NAME}:${PORT}
 echo "Testing no logging of url params option works..."
-docker logs "${MOCKSERVER}" | grep 'Nginxid:'
+docker logs "${MOCKSERVER}" | grep 'nginxid->'
 docker logs ${INSTANCE} | grep '"nginx_uuid": "'
 
 start_test "Test UUID header logging option passes through supplied value..." "${STD_CMD} \
@@ -534,7 +534,7 @@ start_test "Test UUID header logging option passes through supplied value..." "$
            --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 curl -sk -H "nginxId: 00000000-1111-2222-3333-444455556666" https://${DOCKER_HOST_NAME}:${PORT}
 echo "Testing no logging of url params option works..."
-docker logs "${MOCKSERVER}" | grep 'Nginxid:00000000-1111-2222-3333-444455556666'
+docker logs "${MOCKSERVER}" | grep 'nginxid->00000000-1111-2222-3333-444455556666'
 docker logs ${INSTANCE} | grep '"nginx_uuid": "00000000-1111-2222-3333-444455556666"'
 
 start_test "Test VERBOSE_ERROR_PAGES=TRUE displays debug info" "${STD_CMD} \

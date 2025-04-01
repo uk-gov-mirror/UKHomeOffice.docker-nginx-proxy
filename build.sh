@@ -15,7 +15,7 @@ GEOIP_LICENSE_KEY="${GEOIP_LICENSE_KEY:-xxxxxx}"
 GEOIP_CITY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
 GEOIP_COUNTRY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
 GEOIP_MOD_URL='https://github.com/leev/ngx_http_geoip2_module/archive/3.3.tar.gz'
-GEOIP_UPDATE_CLI='https://github.com/maxmind/geoipupdate/releases/download/v4.7.1/geoipupdate_4.7.1_linux_amd64.tar.gz'
+GEOIP_UPDATE_CLI='https://github.com/maxmind/geoipupdate/releases/download/v7.1.0/geoipupdate_7.1.0_linux_amd64.tar.gz'
 GEOIP_URL='https://github.com/maxmind/libmaxminddb/releases/download/1.6.0/libmaxminddb-1.6.0.tar.gz'
 LUAROCKS_URL='https://luarocks.github.io/luarocks/releases/luarocks-3.7.0.tar.gz'
 NAXSI_URL='https://github.com/nbs-system/naxsi/archive/1.3.tar.gz'
@@ -25,7 +25,7 @@ STATSD_URL='https://github.com/UKHomeOffice/nginx-statsd/archive/0.0.1-ngxpatch.
 MAXMIND_PATH='/usr/share/GeoIP'
 
 # Install dependencies to build from source
-yum -y install \
+dnf -y install \
     gcc-c++ \
     gcc \
     git \
@@ -39,7 +39,8 @@ yum -y install \
     readline-devel \
     tar \
     unzip \
-    wget
+    wget \
+    zlib-devel
 
 mkdir -p openresty luarocks naxsi nginx-statsd geoip geoipupdate ngx_http_geoip2_module
 
@@ -107,10 +108,11 @@ popd
 echo "Installing luarocks packages"
 luarocks install uuid
 luarocks install luasocket
+luarocks install lua-resty-openssl
 
 echo "Removing unnecessary developer tooling"
 rm -fr openresty naxsi nginx-statsd geoip luarocks ngx_http_geoip2_module
-yum -y remove \
+dnf -y remove \
     gcc-c++ \
     gcc \
     git \
@@ -121,4 +123,4 @@ yum -y remove \
     pcre-devel \
     readline-devel
 
-yum clean all
+dnf clean all
