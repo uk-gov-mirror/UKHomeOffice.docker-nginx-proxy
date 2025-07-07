@@ -11,7 +11,7 @@ workspace:
 
 steps:
 - name: build_and_test_image
-  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind:v27.5-dind-rc1
   commands:
   - apk add curl bash wget tar
   - /usr/local/bin/wait
@@ -83,4 +83,4 @@ steps:
 
 services:
 - name: docker
-  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind:v27.5-dind-rc1
