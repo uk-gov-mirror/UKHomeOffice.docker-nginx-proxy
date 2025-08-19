@@ -42,6 +42,31 @@ dnf -y install \
     wget \
     zlib-devel
 
+# === Build geoipupdate from source using Go ===
+GO_VERSION="1.23.12"   # or "1.24.6" if you prefer
+APP_NAME="geoipupdate"
+APP_REPO="https://github.com/maxmind/geoipupdate.git"
+APP_TAG="v7.1.1"
+
+echo "[INFO] Installing Go ${GO_VERSION}..."
+curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tar.gz
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+export PATH="/usr/local/go/bin:$PATH"
+
+# Verify Go version
+go version
+
+echo "[INFO] Cloning ${APP_REPO} at ${APP_TAG}..."
+rm -rf "${APP_NAME}"
+git clone --branch "${APP_TAG}" --depth 1 "${APP_REPO}" "${APP_NAME}"
+
+cd "${APP_NAME}"
+echo "[INFO] Building ${APP_NAME} with Go ${GO_VERSION}..."
+go build -o "${APP_NAME}" ./cmd/geoipupdate
+echo "[INFO] Build complete: $(pwd)/${APP_NAME}"
+cd ..
+
 mkdir -p openresty luarocks naxsi nginx-statsd geoip geoipupdate ngx_http_geoip2_module
 
 # Prepare
