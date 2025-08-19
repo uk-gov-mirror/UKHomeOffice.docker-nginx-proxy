@@ -60,11 +60,15 @@ mkdir -p ${MAXMIND_PATH}
 make check install
 echo "/usr/local/lib" >> /etc/ld.so.conf.d/libmaxminddb.conf
 
+
 # Only run if not testing locally
-if [ "$LOCAL_TEST" = false ]; then
-  curl -fSL ${GEOIP_COUNTRY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-Country.mmdb
-  curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
-fi
+# if [ "$LOCAL_TEST" = false ]; then
+#   curl -fSL ${GEOIP_COUNTRY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-Country.mmdb
+#   curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
+# fi
+echo "[INFO] Skipping GeoIP database download due to rate limit. Using cached database files."
+cp /Users/jonholder/Downloads/GeoLite2-Country.mmdb ${MAXMIND_PATH}/GeoLite2-Country.mmdb
+cp /Users/jonholder/Downloads/GeoLite2-City.mmdb ${MAXMIND_PATH}/GeoLite2-City.mmdb
 
 chown -R 1000:1000 ${MAXMIND_PATH}
 popd
