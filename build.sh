@@ -67,8 +67,8 @@ echo "/usr/local/lib" >> /etc/ld.so.conf.d/libmaxminddb.conf
 #   curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
 # fi
 echo "[INFO] Skipping GeoIP database download due to rate limit. Using cached database files from geoip-cache/."
-cp "$(pwd)/geoip-cache/GeoLite2-Country.mmdb" ${MAXMIND_PATH}/GeoLite2-Country.mmdb
-cp "$(pwd)/geoip-cache/GeoLite2-City.mmdb" ${MAXMIND_PATH}/GeoLite2-City.mmdb
+cp ../geoip-cache/GeoLite2-Country.mmdb ${MAXMIND_PATH}/GeoLite2-Country.mmdb
+cp ../geoip-cache/GeoLite2-City.mmdb ${MAXMIND_PATH}/GeoLite2-City.mmdb
 
 chown -R 1000:1000 ${MAXMIND_PATH}
 popd
