@@ -112,6 +112,10 @@ echo "Checking libmaxminddb module"
 ldconfig && ldconfig -p | grep libmaxminddb
 
 echo "Install openresty"
+if [ ! -d "openresty" ]; then
+  echo "[ERROR] openresty directory does not exist. Extraction may have failed."
+  exit 1
+fi
 pushd openresty
 ./configure --add-dynamic-module="/root/ngx_http_geoip2_module" \
             --add-module="../naxsi/naxsi_src" \
