@@ -73,15 +73,16 @@ cp /root/geoip-cache/GeoLite2-City.mmdb ${MAXMIND_PATH}/GeoLite2-City.mmdb
 chown -R 1000:1000 ${MAXMIND_PATH}
 popd
 
-pushd geoipupdate
-sed -i 's/YOUR_ACCOUNT_ID_HERE/'"${GEOIP_ACCOUNT_ID}"'/g' GeoIP.conf
-sed -i 's/YOUR_LICENSE_KEY_HERE/'"${GEOIP_LICENSE_KEY}"'/g' GeoIP.conf
 
+# pushd geoipupdate
+# sed -i 's/YOUR_ACCOUNT_ID_HERE/'"${GEOIP_ACCOUNT_ID}"'/g' GeoIP.conf
+# sed -i 's/YOUR_LICENSE_KEY_HERE/'"${GEOIP_LICENSE_KEY}"'/g' GeoIP.conf
+#
 # Only run if not testing locally
-if [ "$LOCAL_TEST" = false ]; then
-  ./geoipupdate -f GeoIP.conf -d ${MAXMIND_PATH}
-fi
-popd
+# if [ "$LOCAL_TEST" = false ]; then
+#   ./geoipupdate -f GeoIP.conf -d ${MAXMIND_PATH}
+# fi
+# popd
 
 echo "Checking libmaxminddb module"
 ldconfig && ldconfig -p | grep libmaxminddb
