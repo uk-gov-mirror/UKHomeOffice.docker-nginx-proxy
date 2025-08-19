@@ -9,8 +9,8 @@ ARG GEOIP_ACCOUNT_ID
 ARG GEOIP_LICENSE_KEY
 
 WORKDIR /root
-ADD ./geoip-cache/ /root/geoip-cache/
 ADD ./build.sh /root/
+RUN ./build.sh
 
 RUN dnf install -y openssl && \
     dnf clean all && \
@@ -19,8 +19,7 @@ RUN dnf install -y openssl && \
     chmod 600 /etc/keys/key
 
 # This takes a while so best to do it during build
-RUN mkdir -p /usr/local/openresty/nginx/conf/ && \
-    openssl dhparam -out /usr/local/openresty/nginx/conf/dhparam.pem 2048
+RUN openssl dhparam -out /usr/local/openresty/nginx/conf/dhparam.pem 2048
 
 RUN dnf install -y bind-utils dnsmasq diffutils && \
     dnf clean all
@@ -45,11 +44,10 @@ RUN dnf remove -y kernel-headers && \
     dnf clean all
 
 RUN useradd -u 1000 nginx && \
-        install -o nginx -g nginx -d \
-            /usr/local/openresty/naxsi/locations \
-            /usr/local/openresty/nginx/{client_body,fastcgi,proxy,scgi,uwsgi}_temp && \
-        mkdir -p /usr/local/openresty/nginx/logs /usr/share/GeoIP && \
-        chown -R nginx:nginx /usr/local/openresty/nginx/{conf,logs} /usr/share/GeoIP /etc/keys
+    install -o nginx -g nginx -d \
+      /usr/local/openresty/naxsi/locations \
+      /usr/local/openresty/nginx/{client_body,fastcgi,proxy,scgi,uwsgi}_temp && \
+    chown -R nginx:nginx /usr/local/openresty/nginx/{conf,logs} /usr/share/GeoIP /etc/keys
 
 WORKDIR /usr/local/openresty
 

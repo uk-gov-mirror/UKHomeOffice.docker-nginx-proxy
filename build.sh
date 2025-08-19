@@ -15,7 +15,7 @@ GEOIP_LICENSE_KEY="${GEOIP_LICENSE_KEY:-xxxxxx}"
 GEOIP_CITY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
 GEOIP_COUNTRY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
 GEOIP_MOD_URL='https://github.com/leev/ngx_http_geoip2_module/archive/3.3.tar.gz'
-GEOIP_UPDATE_CLI="$(curl -s https://api.github.com/repos/maxmind/geoipupdate/releases/latest | grep 'browser_download_url' | grep 'linux_amd64.tar.gz' | cut -d '"' -f4)"
+GEOIP_UPDATE_CLI="https://github.com/maxmind/geoipupdate/releases/download/v7.1.1/geoipupdate_7.1.1_linux_amd64.tar.gz"
 GEOIP_URL='https://github.com/maxmind/libmaxminddb/releases/download/1.12.2/libmaxminddb-1.12.2.tar.gz'
 LUAROCKS_URL='https://luarocks.github.io/luarocks/releases/luarocks-3.12.0.tar.gz'
 NAXSI_URL='https://github.com/wargio/naxsi/releases/download/1.7/naxsi-1.7-src-with-deps.tar.gz'
@@ -24,7 +24,6 @@ STATSD_URL='https://github.com/UKHomeOffice/nginx-statsd/archive/0.0.1-ngxpatch.
 
 MAXMIND_PATH='/usr/share/GeoIP'
 
-GO_VERSION="1.24.6"
 
 # Install dependencies to build from source
 dnf -y install \
@@ -44,34 +43,16 @@ dnf -y install \
   wget \
   zlib-devel
 
-# === Config ===
-GO_VERSION="1.24.6"   # patched release (or 1.23.12 if you want to stay on 1.23.x)
-APP_NAME="geoipupdate"
-APP_REPO="https://github.com/maxmind/geoipupdate.git"
-APP_TAG="v7.1.1"
-
-# === Install Go ===
-echo "[INFO] Installing Go ${GO_VERSION}..."
-curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tar.gz
-rm -rf "$HOME/go" /tmp/go-install
-mkdir -p /tmp/go-install
-tar -C /tmp/go-install -xzf /tmp/go.tar.gz
-export PATH="/tmp/go-install/go/bin:$PATH"
-
-# Verify Go version
+# Install Go 1.24.6 securely
+GO_VERSION=1.24.6
+GO_TARBALL="go${GO_VERSION}.linux-amd64.tar.gz"
+GO_URL="https://go.dev/dl/${GO_TARBALL}"
+wget -q $GO_URL
+rm -rf /usr/local/go
+tar -C /usr/local -xzf $GO_TARBALL
+rm $GO_TARBALL
+export PATH=$PATH:/usr/local/go/bin
 go version
-
-# === Clone and build geoipupdate ===
-echo "[INFO] Cloning ${APP_REPO} at ${APP_TAG}..."
-rm -rf "${APP_NAME}"
-git clone --branch "${APP_TAG}" --depth 1 "${APP_REPO}" "${APP_NAME}"
-
-cd "${APP_NAME}"
-
-echo "[INFO] Building ${APP_NAME} with Go ${GO_VERSION}..."
-go build -o "${APP_NAME}" ./cmd/geoipupdate
-
-echo "[INFO] Build complete: $(pwd)/${APP_NAME}"
 
 mkdir -p openresty luarocks naxsi nginx-statsd geoip geoipupdate ngx_http_geoip2_module
 
