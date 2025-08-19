@@ -15,7 +15,7 @@ GEOIP_LICENSE_KEY="${GEOIP_LICENSE_KEY:-xxxxxx}"
 GEOIP_CITY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
 GEOIP_COUNTRY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
 GEOIP_MOD_URL='https://github.com/leev/ngx_http_geoip2_module/archive/3.3.tar.gz'
-GEOIP_UPDATE_CLI='https://github.com/maxmind/geoipupdate/releases/download/v7.1.1/geoipupdate_7.1.1_linux_amd64.tar.gz'
+GEOIP_UPDATE_CLI="$(curl -s https://api.github.com/repos/maxmind/geoipupdate/releases/latest | grep 'browser_download_url' | grep 'linux_amd64.tar.gz' | cut -d '"' -f4)"
 GEOIP_URL='https://github.com/maxmind/libmaxminddb/releases/download/1.12.2/libmaxminddb-1.12.2.tar.gz'
 LUAROCKS_URL='https://luarocks.github.io/luarocks/releases/luarocks-3.12.0.tar.gz'
 NAXSI_URL='https://github.com/wargio/naxsi/releases/download/1.7/naxsi-1.7-src-with-deps.tar.gz'
