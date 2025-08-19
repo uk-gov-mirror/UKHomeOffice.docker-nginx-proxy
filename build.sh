@@ -46,7 +46,7 @@ dnf -y install \
 GO_VERSION="1.24.6"
 APP_NAME="geoipupdate"
 APP_REPO="https://github.com/maxmind/geoipupdate.git"
-APP_TAG="v7.1.1"
+APP_TAG="$(curl -s https://api.github.com/repos/maxmind/geoipupdate/releases/latest | grep 'tag_name' | cut -d '"' -f4)"
 
 echo "[INFO] Installing Go ${GO_VERSION}..."
 curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tar.gz
