@@ -76,8 +76,11 @@ cd ..
 
 mkdir -p openresty luarocks naxsi nginx-statsd geoip geoipupdate ngx_http_geoip2_module
 
+
 # Prepare
-wget -qO - "$OPEN_RESTY_URL"   | tar xzv --strip-components 1 -C openresty/
+mkdir -p openresty luarocks naxsi nginx-statsd geoip geoipupdate ngx_http_geoip2_module
+echo "[INFO] Extracting OpenResty..."
+wget -qO - "$OPEN_RESTY_URL" | tar xzv --strip-components 1 -C openresty/ || { echo "[ERROR] Failed to extract OpenResty."; exit 1; }
 wget -qO - "$LUAROCKS_URL"     | tar xzv --strip-components 1 -C luarocks/
 wget -qO - "$NAXSI_URL"        | tar xzv --strip-components 1 -C naxsi/
 wget -qO - "$STATSD_URL"       | tar xzv --strip-components 1 -C nginx-statsd/
