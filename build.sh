@@ -1,3 +1,10 @@
+# Only run if not testing locally
+# if [ "$LOCAL_TEST" = false ]; then
+#   curl -fSL ${GEOIP_COUNTRY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-Country.mmdb
+#   curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
+# fi
+# Using cached GeoIP database instead of downloading
+echo "[INFO] GeoIP database upgrade is skipped; using cached database."
 #!/usr/bin/env bash
 # Script to install the openresty from source and to tidy up after...
 
@@ -85,11 +92,13 @@ mkdir -p ${MAXMIND_PATH}
 make check install
 echo "/usr/local/lib" >> /etc/ld.so.conf.d/libmaxminddb.conf
 
+
 # Only run if not testing locally
-if [ "$LOCAL_TEST" = false ]; then
-  curl -fSL ${GEOIP_COUNTRY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-Country.mmdb
-  curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
-fi
+# if [ "$LOCAL_TEST" = false ]; then
+#   curl -fSL ${GEOIP_COUNTRY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-Country.mmdb
+#   curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
+# fi
+# Using cached GeoIP database instead of downloading
 
 chown -R 1000:1000 ${MAXMIND_PATH}
 popd
