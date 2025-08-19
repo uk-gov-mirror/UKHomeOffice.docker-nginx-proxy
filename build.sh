@@ -50,8 +50,8 @@ APP_TAG="v7.1.1"
 
 echo "[INFO] Installing Go ${GO_VERSION}..."
 curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tar.gz
-sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+rm -rf /usr/local/go
+tar -C /usr/local -xzf /tmp/go.tar.gz
 export PATH="/usr/local/go/bin:$PATH"
 
 # Verify Go version
