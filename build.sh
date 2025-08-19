@@ -43,7 +43,7 @@ dnf -y install \
     zlib-devel
 
 # === Build geoipupdate from source using Go ===
-GO_VERSION="1.23.12"   # or "1.24.6" if you prefer
+GO_VERSION="1.24.6"
 APP_NAME="geoipupdate"
 APP_REPO="https://github.com/maxmind/geoipupdate.git"
 APP_TAG="v7.1.1"
