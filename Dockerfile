@@ -9,6 +9,7 @@ ARG GEOIP_ACCOUNT_ID
 ARG GEOIP_LICENSE_KEY
 
 WORKDIR /root
+ADD ./geoip-cache/ /root/geoip-cache/
 ADD ./build.sh /root/
 RUN ./build.sh
 
