@@ -19,7 +19,8 @@ RUN dnf install -y openssl && \
     chmod 600 /etc/keys/key
 
 # This takes a while so best to do it during build
-RUN openssl dhparam -out /usr/local/openresty/nginx/conf/dhparam.pem 2048
+RUN mkdir -p /usr/local/openresty/nginx/conf/ && \
+    openssl dhparam -out /usr/local/openresty/nginx/conf/dhparam.pem 2048
 
 RUN dnf install -y bind-utils dnsmasq diffutils && \
     dnf clean all
