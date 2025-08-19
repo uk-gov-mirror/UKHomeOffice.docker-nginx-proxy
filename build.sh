@@ -24,8 +24,16 @@ STATSD_URL='https://github.com/UKHomeOffice/nginx-statsd/archive/0.0.1-ngxpatch.
 
 MAXMIND_PATH='/usr/share/GeoIP'
 
+GO_VERSION="1.24.6"
+
 # Install dependencies to build from source
 dnf -y install \
+echo "[INFO] Installing Go ${GO_VERSION}..."
+curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tar.gz
+rm -rf /usr/local/go
+tar -C /usr/local -xzf /tmp/go.tar.gz
+export PATH="/usr/local/go/bin:$PATH"
+go version
     gcc-c++ \
     gcc \
     git \
