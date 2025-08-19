@@ -101,17 +101,9 @@ echo "/usr/local/lib" >> /etc/ld.so.conf.d/libmaxminddb.conf
 # Using cached GeoIP database instead of downloading
 
 chown -R 1000:1000 ${MAXMIND_PATH}
-popd
 
-pushd geoipupdate
-sed -i 's/YOUR_ACCOUNT_ID_HERE/'"${GEOIP_ACCOUNT_ID}"'/g' GeoIP.conf
-sed -i 's/YOUR_LICENSE_KEY_HERE/'"${GEOIP_LICENSE_KEY}"'/g' GeoIP.conf
-
-# Only run if not testing locally
-if [ "$LOCAL_TEST" = false ]; then
-  ./geoipupdate -f GeoIP.conf -d ${MAXMIND_PATH}
-fi
-popd
+# Skipping geoipupdate database download due to MaxMind rate limits; using cached database.
+echo "[INFO] geoipupdate database download skipped; using cached database."
 
 echo "Checking libmaxminddb module"
 ldconfig && ldconfig -p | grep libmaxminddb
@@ -125,7 +117,6 @@ pushd openresty
             --with-http_v2_module \
             --with-http_stub_status_module
 make install
-popd
 
 echo "Install NAXSI default rules"
 mkdir -p /usr/local/openresty/naxsi/
