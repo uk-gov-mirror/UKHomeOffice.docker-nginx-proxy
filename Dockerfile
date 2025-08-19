@@ -11,7 +11,6 @@ ARG GEOIP_LICENSE_KEY
 WORKDIR /root
 ADD ./geoip-cache/ /root/geoip-cache/
 ADD ./build.sh /root/
-RUN bash /root/build.sh
 
 RUN dnf install -y openssl && \
     dnf clean all && \
