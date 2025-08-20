@@ -15,8 +15,8 @@ GEOIP_LICENSE_KEY="${GEOIP_LICENSE_KEY:-xxxxxx}"
 GEOIP_CITY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
 GEOIP_COUNTRY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
 GEOIP_MOD_URL='https://github.com/leev/ngx_http_geoip2_module/archive/3.3.tar.gz'
-GEOIP_UPDATE_CLI='https://github.com/maxmind/geoipupdate/releases/download/v7.1.0/geoipupdate_7.1.0_linux_amd64.tar.gz'
-GEOIP_URL='https://github.com/maxmind/libmaxminddb/releases/download/1.6.0/libmaxminddb-1.6.0.tar.gz'
+GEOIP_UPDATE_CLI='https://github.com/maxmind/geoipupdate/releases/download/v7.1.1/geoipupdate_7.1.1_linux_amd64.tar.gz'
+GEOIP_URL='https://github.com/maxmind/libmaxminddb/releases/download/1.12.2/libmaxminddb-1.12.2.tar.gz'
 LUAROCKS_URL='https://luarocks.github.io/luarocks/releases/luarocks-3.12.0.tar.gz'
 NAXSI_URL='https://github.com/wargio/naxsi/releases/download/1.7/naxsi-1.7-src-with-deps.tar.gz'
 OPEN_RESTY_URL='http://openresty.org/download/openresty-1.27.1.2.tar.gz'
@@ -60,24 +60,29 @@ mkdir -p ${MAXMIND_PATH}
 make check install
 echo "/usr/local/lib" >> /etc/ld.so.conf.d/libmaxminddb.conf
 
+
 # Only run if not testing locally
-if [ "$LOCAL_TEST" = false ]; then
-  curl -fSL ${GEOIP_COUNTRY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-Country.mmdb
-  curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
-fi
+# if [ "$LOCAL_TEST" = false ]; then
+#   curl -fSL ${GEOIP_COUNTRY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-Country.mmdb
+#   curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
+# fi
+echo "[INFO] Skipping GeoIP database download due to rate limit. Using cached database files from /root/geoip-cache/."
+cp /root/geoip-cache/GeoLite2-Country.mmdb ${MAXMIND_PATH}/GeoLite2-Country.mmdb
+cp /root/geoip-cache/GeoLite2-City.mmdb ${MAXMIND_PATH}/GeoLite2-City.mmdb
 
 chown -R 1000:1000 ${MAXMIND_PATH}
 popd
 
-pushd geoipupdate
-sed -i 's/YOUR_ACCOUNT_ID_HERE/'"${GEOIP_ACCOUNT_ID}"'/g' GeoIP.conf
-sed -i 's/YOUR_LICENSE_KEY_HERE/'"${GEOIP_LICENSE_KEY}"'/g' GeoIP.conf
 
+# pushd geoipupdate
+# sed -i 's/YOUR_ACCOUNT_ID_HERE/'"${GEOIP_ACCOUNT_ID}"'/g' GeoIP.conf
+# sed -i 's/YOUR_LICENSE_KEY_HERE/'"${GEOIP_LICENSE_KEY}"'/g' GeoIP.conf
+#
 # Only run if not testing locally
-if [ "$LOCAL_TEST" = false ]; then
-  ./geoipupdate -f GeoIP.conf -d ${MAXMIND_PATH}
-fi
-popd
+# if [ "$LOCAL_TEST" = false ]; then
+#   ./geoipupdate -f GeoIP.conf -d ${MAXMIND_PATH}
+# fi
+# popd
 
 echo "Checking libmaxminddb module"
 ldconfig && ldconfig -p | grep libmaxminddb
