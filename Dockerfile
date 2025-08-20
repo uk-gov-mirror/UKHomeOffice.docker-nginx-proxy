@@ -23,10 +23,9 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 
 # Add build script and build geoipupdate
 ADD ./build.sh /root/
-ARG GEOIP_LICENSE_KEY=xxxxxx
-ENV GEOIP_LICENSE_KEY=${GEOIP_LICENSE_KEY}
+ARG GEOIP_ACCOUNT_ID="${GEOIP_ACCOUNT_ID:-123456}"
+ENV GEOIP_LICENSE_KEY="${GEOIP_LICENSE_KEY:-xxxxxx}"
 RUN chmod +x /root/build.sh && /root/build.sh
-
 
 
 # --- Final runtime image ---
