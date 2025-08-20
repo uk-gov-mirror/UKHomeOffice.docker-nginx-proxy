@@ -44,6 +44,7 @@ dnf -y install \
 
 mkdir -p openresty luarocks naxsi nginx-statsd geoip geoipupdate ngx_http_geoip2_module
 
+
 # Prepare
 wget -qO - "$OPEN_RESTY_URL"   | tar xzv --strip-components 1 -C openresty/
 wget -qO - "$LUAROCKS_URL"     | tar xzv --strip-components 1 -C luarocks/
@@ -52,6 +53,11 @@ wget -qO - "$STATSD_URL"       | tar xzv --strip-components 1 -C nginx-statsd/
 wget -qO - "$GEOIP_URL"        | tar xzv --strip-components 1 -C geoip/
 wget -qO - "$GEOIP_UPDATE_CLI" | tar xzv --strip-components 1 -C geoipupdate/
 wget -qO - "$GEOIP_MOD_URL"    | tar xzv --strip-components 1 -C ngx_http_geoip2_module/
+
+# Ensure geoipupdate binary is available for Docker COPY
+if [ -f /root/geoipupdate/geoipupdate ]; then
+  cp /root/geoipupdate/geoipupdate /usr/local/bin/geoipupdate
+fi
 
 # Build
 pushd geoip
