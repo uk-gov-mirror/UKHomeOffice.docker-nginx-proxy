@@ -4,11 +4,11 @@
 set -eu
 set -o pipefail
 
-if [ -z "$GEOIP_LICENSE_KEY" ]; then
-  LOCAL_TEST=true
-else
-  LOCAL_TEST=false
-fi
+# if [ -z "$GEOIP_LICENSE_KEY" ]; then
+#   LOCAL_TEST=true
+# else
+#   LOCAL_TEST=false
+# fi
 
 # GEOIP_ACCOUNT_ID="${GEOIP_ACCOUNT_ID:-123456}"
 # GEOIP_LICENSE_KEY="${GEOIP_LICENSE_KEY:-xxxxxx}"

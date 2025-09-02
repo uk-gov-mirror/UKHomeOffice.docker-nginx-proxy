@@ -5,8 +5,8 @@ RUN dnf update -y && \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-ARG GEOIP_ACCOUNT_ID
-ARG GEOIP_LICENSE_KEY
+# ARG GEOIP_ACCOUNT_ID
+# ARG GEOIP_LICENSE_KEY
 
 WORKDIR /root
 ADD ./build.sh /root/
