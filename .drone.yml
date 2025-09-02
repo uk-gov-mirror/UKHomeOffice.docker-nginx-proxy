@@ -17,6 +17,7 @@ steps:
   - /usr/local/bin/wait
   - ./ci-build.sh
   - docker build -t ngx:latest .
+  - docker tag ngx:latest ngx-${DRONE_BUILD_NUMBER}:latest
   - docker tag ngx:latest docker-nginx-proxy:latest
   # environment:
   #   GEOIP_ACCOUNT_ID:
@@ -33,7 +34,7 @@ steps:
   image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
   pull: always
   environment:
-    IMAGE_NAME: nginx:latest
+    IMAGE_NAME: docker-nginx-proxy:latest
     LOCAL_IMAGE: true
     ALLOW_CVE_LIST_FILE: whitelist
     SEVERITY: HIGH,CRITICAL
