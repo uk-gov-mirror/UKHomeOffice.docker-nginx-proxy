@@ -2,7 +2,7 @@
 
 set -e
 
-TAG=ngx
+TAG=ngx:latest
 BUILD_NUMBER="${BUILD_NUMBER:-${DRONE_BUILD_NUMBER}}"
 PORT="${HTTPS_LISTEN_PORT:-10443}"
 BUILD_NUMBER="${BUILD_NUMBER:-local}"
@@ -56,7 +56,7 @@ function add_files_to_container() {
 }
 
 function start_test() {
-    INSTANCE="${TAG}-${BUILD_NUMBER}"
+  INSTANCE="ngx-${BUILD_NUMBER}"
     tear_down
     HTTPS_LISTEN_PORT=${HTTPS_LISTEN_PORT:-10443}
     echo ""
@@ -72,8 +72,8 @@ function start_test() {
       files="${files} $1"
       shift
     done
-    echo "Running: $@ --name ${INSTANCE} -p ${PORT}:${HTTPS_LISTEN_PORT} ${TAG}"
-    bash -c "$@ --name ${INSTANCE} -d -p ${PORT}:${HTTPS_LISTEN_PORT} ${TAG}"
+  echo "Running: $@ --name ${INSTANCE} -p ${PORT}:${HTTPS_LISTEN_PORT} ${TAG}"
+  bash -c "$@ --name ${INSTANCE} -d -p ${PORT}:${HTTPS_LISTEN_PORT} ${TAG}"
     # if files needed to be mounted in, the container stops immediately so start it again
     if [[ ${files} != "" ]]; then
       echo "${files}"
