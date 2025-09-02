@@ -3,8 +3,10 @@
 
 set -eu
 
-# Set default for OPEN_RESTY_URL if not already set
 OPEN_RESTY_URL=${OPEN_RESTY_URL:-http://openresty.org/download/openresty-1.27.1.2.tar.gz}
+LUAROCKS_URL=${LUAROCKS_URL:-https://luarocks.github.io/luarocks/releases/luarocks-3.12.0.tar.gz}
+NAXSI_URL=${NAXSI_URL:-https://github.com/wargio/naxsi/releases/download/1.7/naxsi-1.7-src-with-deps.tar.gz}
+STATSD_URL=${STATSD_URL:-https://github.com/UKHomeOffice/nginx-statsd/archive/0.0.1-ngxpatch.tar.gz}
 set -o pipefail
 
 # ...existing code...
