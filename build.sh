@@ -2,6 +2,9 @@
 # Script to install the openresty from source and to tidy up after...
 
 set -eu
+
+# Set default for OPEN_RESTY_URL if not already set
+OPEN_RESTY_URL=${OPEN_RESTY_URL:-http://openresty.org/download/openresty-1.27.1.2.tar.gz}
 set -o pipefail
 
 # ...existing code...
