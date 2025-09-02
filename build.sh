@@ -74,10 +74,10 @@ popd
 # sed -i 's/YOUR_LICENSE_KEY_HERE/'"${GEOIP_LICENSE_KEY}"'/g' GeoIP.conf
 
 # Only run if not testing locally
-if [ "$LOCAL_TEST" = false ]; then
-  ./geoipupdate -f GeoIP.conf -d ${MAXMIND_PATH}
-fi
-popd
+# if [ "$LOCAL_TEST" = false ]; then
+#   ./geoipupdate -f GeoIP.conf -d ${MAXMIND_PATH}
+# fi
+# popd
 
 # echo "Checking libmaxminddb module"
 # ldconfig && ldconfig -p | grep libmaxminddb
