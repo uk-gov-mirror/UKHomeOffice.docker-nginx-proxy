@@ -4,25 +4,13 @@
 set -eu
 set -o pipefail
 
-# if [ -z "$GEOIP_LICENSE_KEY" ]; then
-#   LOCAL_TEST=true
-# else
-#   LOCAL_TEST=false
-# fi
-
-# GEOIP_ACCOUNT_ID="${GEOIP_ACCOUNT_ID:-123456}"
-# GEOIP_LICENSE_KEY="${GEOIP_LICENSE_KEY:-xxxxxx}"
-# GEOIP_CITY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
-# GEOIP_COUNTRY_URL="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${GEOIP_LICENSE_KEY}&suffix=tar.gz"
-# GEOIP_MOD_URL='https://github.com/leev/ngx_http_geoip2_module/archive/3.4.tar.gz'
-# GEOIP_UPDATE_CLI='https://github.com/maxmind/geoipupdate/releases/download/v7.1.1/geoipupdate_7.1.1_linux_amd64.tar.gz'
-# GEOIP_URL='https://github.com/maxmind/libmaxminddb/releases/download/1.12.2/libmaxminddb-1.12.2.tar.gz'
+# ...existing code...
 # LUAROCKS_URL='https://luarocks.github.io/luarocks/releases/luarocks-3.12.0.tar.gz'
 # NAXSI_URL='https://github.com/wargio/naxsi/releases/download/1.7/naxsi-1.7-src-with-deps.tar.gz'
 # OPEN_RESTY_URL='http://openresty.org/download/openresty-1.27.1.2.tar.gz'
 # STATSD_URL='https://github.com/UKHomeOffice/nginx-statsd/archive/0.0.1-ngxpatch.tar.gz'
 
-MAXMIND_PATH='/usr/share/GeoIP'
+ # ...existing code...
 
 # Install dependencies to build from source
 dnf -y install \
@@ -42,49 +30,25 @@ dnf -y install \
     wget \
     zlib-devel
 
-mkdir -p openresty luarocks naxsi nginx-statsd geoip geoipupdate ngx_http_geoip2_module
+mkdir -p openresty luarocks naxsi nginx-statsd
 
 # Prepare
 wget -qO - "$OPEN_RESTY_URL"   | tar xzv --strip-components 1 -C openresty/
 wget -qO - "$LUAROCKS_URL"     | tar xzv --strip-components 1 -C luarocks/
 wget -qO - "$NAXSI_URL"        | tar xzv --strip-components 1 -C naxsi/
 wget -qO - "$STATSD_URL"       | tar xzv --strip-components 1 -C nginx-statsd/
-# wget -qO - "$GEOIP_URL"        | tar xzv --strip-components 1 -C geoip/
-# wget -qO - "$GEOIP_UPDATE_CLI" | tar xzv --strip-components 1 -C geoipupdate/
-# wget -qO - "$GEOIP_MOD_URL"    | tar xzv --strip-components 1 -C ngx_http_geoip2_module/
+ # ...existing code...
 
-# Build
-pushd geoip
-mkdir -p ${MAXMIND_PATH}
-./configure
-make check install
-echo "/usr/local/lib" >> /etc/ld.so.conf.d/libminddb.conf
-
-# Only run if not testing locally
-# if [ "$LOCAL_TEST" = false ]; then
-#   curl -fSL ${GEOIP_COUNTRY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-Country.mmdb
-#   curl -fSL ${GEOIP_CITY_URL} | tar -xz > ${MAXMIND_PATH}/GeoLite2-City.mmdb
-# fi
-
-chown -R 1000:1000 ${MAXMIND_PATH}
 popd
+ # ...existing code...
 
-# pushd geoipupdate
-# sed -i 's/YOUR_ACCOUNT_ID_HERE/'"${GEOIP_ACCOUNT_ID}"'/g' GeoIP.conf
-# sed -i 's/YOUR_LICENSE_KEY_HERE/'"${GEOIP_LICENSE_KEY}"'/g' GeoIP.conf
+ # ...existing code...
 
-# Only run if not testing locally
-# if [ "$LOCAL_TEST" = false ]; then
-#   ./geoipupdate -f GeoIP.conf -d ${MAXMIND_PATH}
-# fi
-# popd
-
-# echo "Checking libmaxminddb module"
-# ldconfig && ldconfig -p | grep libmaxminddb
+ # ...existing code...
 
 echo "Install openresty"
 pushd openresty
-./configure --add-dynamic-module="/root/ngx_http_geoip2_module" \
+./configure \
             --add-module="../naxsi/naxsi_src" \
             --add-module="../nginx-statsd" \
             --with-http_realip_module \
@@ -111,7 +75,7 @@ luarocks install luasocket
 luarocks install lua-resty-openssl
 
 echo "Removing unnecessary developer tooling"
-rm -fr openresty naxsi nginx-statsd geoip luarocks ngx_http_geoip2_module
+rm -fr openresty naxsi nginx-statsd luarocks
 dnf -y remove \
     gcc-c++ \
     gcc \

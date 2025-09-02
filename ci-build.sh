@@ -91,7 +91,7 @@ echo "========"
 echo "BUILD..."
 echo "========"
 echo "travis_fold:start:BUILD"
-# docker build --build-arg GEOIP_ACCOUNT_ID=${GEOIP_ACCOUNT_ID} --build-arg GEOIP_LICENSE_KEY=${GEOIP_LICENSE_KEY} -t ${TAG} .
+ # ...existing code...
 echo "travis_fold:end:BUILD"
 
 echo "Running mocking-server..."
@@ -131,32 +131,9 @@ if docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo
   exit 2
 fi
 
-start_test "Test enabling GEODB settings" "${STD_CMD} \
-           -e \"PROXY_SERVICE_HOST=http://${MOCKSERVER}\" \
-           -e \"PROXY_SERVICE_PORT=${MOCKSERVER_PORT}\" \
-           -e \"DNSMASK=TRUE\" \
-           -e \"ENABLE_UUID_PARAM=FALSE\" \
-           -e \"ALLOW_COUNTRY_CSV=GB,FR,O1\" \
-           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
-echo "Test GeoIP config isn't rejected..."
-curl --fail -s -v -k https://${DOCKER_HOST_NAME}:${PORT}/
+ # ...existing code...
 
-start_test "Test GEODB settings can reject..." "${STD_CMD} \
-           -e \"PROXY_SERVICE_HOST=http://${MOCKSERVER}\" \
-           -e \"PROXY_SERVICE_PORT=${MOCKSERVER_PORT}\" \
-           -e \"DNSMASK=TRUE\" \
-           -e \"ENABLE_UUID_PARAM=FALSE\" \
-           -e \"ALLOW_COUNTRY_CSV=CG\" \
-           -e \"DENY_COUNTRY_ON=TRUE\" \
-           -e \"ADD_NGINX_LOCATION_CFG=error_page 403 /nginx-proxy/50x.shtml;\" \
-           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
-echo "Test GeoIP config IS rejected..."
-if ! curl -v -k -H "X-Forwarded-For: 8.8.8.8" https://${DOCKER_HOST_NAME}:${PORT}/ 2>&1 \/ | grep '403 Forbidden' ; then
-  echo "We were expecting to be rejected with 403 error here - we are not in the Congo!"
-  exit 2
-else
-  echo "Rejected as expected - we are not in the Congo!"
-fi
+ # ...existing code...
 
 start_test "Test rate limits 1 per second" "${STD_CMD} \
            -e \"PROXY_SERVICE_HOST=http://${MOCKSERVER}\" \

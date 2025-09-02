@@ -17,6 +17,7 @@ steps:
   - /usr/local/bin/wait
   - ./ci-build.sh
   - docker build -t ngx:latest .
+  - docker tag ngx:latest docker-nginx-proxy:latest
   # environment:
   #   GEOIP_ACCOUNT_ID:
   #     from_secret: geoip_account_id
