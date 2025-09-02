@@ -16,9 +16,9 @@ steps:
   - apk add curl bash wget tar
   - /usr/local/bin/wait
   - ./ci-build.sh
-  - docker build -t ngx:latest .
-  - docker tag ngx:latest ngx-${DRONE_BUILD_NUMBER}:latest
-  - docker tag ngx:latest docker-nginx-proxy:latest
+  - docker build -t $TAG .
+  - docker tag ${TAG} ngx-${DRONE_BUILD_NUMBER}:latest
+  - docker tag ${TAG} docker-nginx-proxy:latest
   # environment:
   #   GEOIP_ACCOUNT_ID:
   #     from_secret: geoip_account_id
