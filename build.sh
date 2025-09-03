@@ -40,6 +40,10 @@ mkdir -p openresty luarocks naxsi nginx-statsd
 # Prepare
 wget -qO - "$OPEN_RESTY_URL"   | tar xzv --strip-components 1 -C openresty/
 wget -qO - "$LUAROCKS_URL"     | tar xzv --strip-components 1 -C luarocks/
+if [ ! -d "luarocks" ]; then
+    echo "ERROR: luarocks directory not created. Download or extraction failed."
+    exit 1
+fi
 wget -qO - "$NAXSI_URL"        | tar xzv --strip-components 1 -C naxsi/
 wget -qO - "$STATSD_URL"       | tar xzv --strip-components 1 -C nginx-statsd/
  # ...existing code...
