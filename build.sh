@@ -40,9 +40,21 @@ mkdir -p openresty luarocks naxsi nginx-statsd
 # Prepare
 wget -qO - "$OPEN_RESTY_URL"   | tar xzv --strip-components 1 -C openresty/
 wget -qO - "$LUAROCKS_URL"     | tar xzv --strip-components 1 -C luarocks/
-if [ ! -d "luarocks" ]; then
-    echo "ERROR: luarocks directory not created. Download or extraction failed."
+
+LUAROCKS_DIR="$PWD/luarocks"
+
+# Clone luarocks if not already present
+if [ ! -d "$LUAROCKS_DIR" ]; then
+  git clone https://github.com/luarocks/luarocks.git "$LUAROCKS_DIR" || {
+    echo "ERROR: Failed to clone luarocks repository."
     exit 1
+  }
+fi
+
+# Final sanity check
+if [ ! -d "$LUAROCKS_DIR" ]; then
+  echo "ERROR: luarocks directory not created. Download or extraction failed."
+  exit 1
 fi
 wget -qO - "$NAXSI_URL"        | tar xzv --strip-components 1 -C naxsi/
 wget -qO - "$STATSD_URL"       | tar xzv --strip-components 1 -C nginx-statsd/
@@ -77,12 +89,14 @@ else
 fi
 
 echo "Installing luarocks"
-pushd luarocks
+pushd "$PWD/luarocks"
+
 ./configure --with-lua=/usr/local/openresty/luajit \
             --lua-suffix=jit-2.1 \
             --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1
 make build install
 
+popd
 
 echo "Installing luarocks packages"
 luarocks install uuid
