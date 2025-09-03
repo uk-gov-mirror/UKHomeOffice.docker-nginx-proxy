@@ -76,7 +76,12 @@ if [ "${NAXSI_USE_DEFAULT_RULES}" == "FALSE" ]; then
 else
     msg "Core NAXSI rules enabled @ /usr/local/openresty/naxsi/naxsi_core.rules"
     msg "NAXSI location rules enabled @ ${NAXSI_LOCATION_RULES}/${LOCATION_ID}.rules"
-    cp /usr/local/openresty/naxsi/location.template ${NAXSI_LOCATION_RULES}/${LOCATION_ID}.rules
+    if [ -f /usr/local/openresty/naxsi/location.template ]; then
+        cp /usr/local/openresty/naxsi/location.template ${NAXSI_LOCATION_RULES}/${LOCATION_ID}.rules
+    else
+        msg "Warning: location.template not found at /usr/local/openresty/naxsi/location.template. Creating empty rules file."
+        touch ${NAXSI_LOCATION_RULES}/${LOCATION_ID}.rules
+    fi
     if [ "${EXTRA_NAXSI_RULES}" != "" ]; then
         msg "Adding extra NAXSI rules from environment"
         echo ''>>${NAXSI_LOCATION_RULES}/location.rules

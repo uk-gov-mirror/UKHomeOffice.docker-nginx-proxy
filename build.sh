@@ -64,7 +64,13 @@ make install
 
 echo "Install NAXSI default rules"
 mkdir -p /usr/local/openresty/naxsi/
-cp "./naxsi/naxsi_rules/naxsi_core.rules" /usr/local/openresty/naxsi/
+if [ -f "./naxsi/naxsi_rules/naxsi_core.rules" ]; then
+    cp "./naxsi/naxsi_rules/naxsi_core.rules" /usr/local/openresty/naxsi/
+elif [ -f "./naxsi/naxsi_core.rules" ]; then
+    cp "./naxsi/naxsi_core.rules" /usr/local/openresty/naxsi/
+else
+    wget -O /usr/local/openresty/naxsi/naxsi_core.rules https://raw.githubusercontent.com/nbs-system/naxsi/master/naxsi_core.rules
+fi
 
 echo "Installing luarocks"
 pushd luarocks
