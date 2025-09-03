@@ -38,7 +38,7 @@ ADD ./security_defaults.conf /usr/local/openresty/nginx/conf/
 ADD ./html/ /usr/local/openresty/nginx/html/
 ADD ./readyness.sh /
 ADD ./helper.sh /
-ADD ./refresh_geoip.sh /
+
 
 RUN dnf remove -y kernel-headers && \
     dnf clean all
