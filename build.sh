@@ -44,7 +44,7 @@ wget -qO - "$NAXSI_URL"        | tar xzv --strip-components 1 -C naxsi/
 wget -qO - "$STATSD_URL"       | tar xzv --strip-components 1 -C nginx-statsd/
  # ...existing code...
 
-popd
+
  # ...existing code...
 
  # ...existing code...
@@ -60,7 +60,7 @@ pushd openresty
             --with-http_v2_module \
             --with-http_stub_status_module
 make install
-popd
+
 
 echo "Install NAXSI default rules"
 mkdir -p /usr/local/openresty/naxsi/
@@ -72,7 +72,7 @@ pushd luarocks
             --lua-suffix=jit-2.1 \
             --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1
 make build install
-popd
+
 
 echo "Installing luarocks packages"
 luarocks install uuid
