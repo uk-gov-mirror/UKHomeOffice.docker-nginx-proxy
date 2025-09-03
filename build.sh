@@ -39,22 +39,21 @@ mkdir -p openresty luarocks naxsi nginx-statsd
 
 # Prepare
 wget -qO - "$OPEN_RESTY_URL"   | tar xzv --strip-components 1 -C openresty/
-wget -qO - "$LUAROCKS_URL"     | tar xzv --strip-components 1 -C luarocks/
-
-LUAROCKS_DIR="$PWD/luarocks"
-
-# Clone luarocks if not already present
-if [ ! -d "$LUAROCKS_DIR" ]; then
-  git clone https://github.com/luarocks/luarocks.git "$LUAROCKS_DIR" || {
-    echo "ERROR: Failed to clone luarocks repository."
+echo "Downloading and extracting LuaRocks..."
+wget -O luarocks.tar.gz "$LUAROCKS_URL"
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to download LuaRocks from $LUAROCKS_URL"
     exit 1
-  }
 fi
-
-# Final sanity check
-if [ ! -d "$LUAROCKS_DIR" ]; then
-  echo "ERROR: luarocks directory not created. Download or extraction failed."
-  exit 1
+tar xzvf luarocks.tar.gz --strip-components 1 -C luarocks/
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to extract LuaRocks archive."
+    exit 1
+fi
+rm luarocks.tar.gz
+if [ ! -d "luarocks" ] || [ -z "$(ls -A luarocks)" ]; then
+    echo "ERROR: luarocks directory not created or is empty. Download or extraction failed."
+    exit 1
 fi
 wget -qO - "$NAXSI_URL"        | tar xzv --strip-components 1 -C naxsi/
 wget -qO - "$STATSD_URL"       | tar xzv --strip-components 1 -C nginx-statsd/
@@ -88,20 +87,26 @@ else
     wget -O /usr/local/openresty/naxsi/naxsi_core.rules https://raw.githubusercontent.com/nbs-system/naxsi/master/naxsi_config/naxsi_core.rules
 fi
 
-echo "Installing luarocks"
-pushd "$PWD/luarocks"
-
+echo "Installing LuaRocks..."
+pushd luarocks
 ./configure --with-lua=/usr/local/openresty/luajit \
-            --lua-suffix=jit-2.1 \
-            --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1
+                        --lua-suffix=jit-2.1 \
+                        --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1
 make build install
-
+if ! command -v luarocks >/dev/null 2>&1; then
+    echo "ERROR: luarocks binary not found after installation."
+    exit 1
+fi
 popd
 
-echo "Installing luarocks packages"
-luarocks install uuid
-luarocks install luasocket
-luarocks install lua-resty-openssl
+echo "Installing LuaRocks packages..."
+if ! command -v luarocks >/dev/null 2>&1; then
+    echo "ERROR: luarocks binary not found. Lua packages cannot be installed."
+    exit 1
+fi
+luarocks install uuid || { echo "ERROR: Failed to install uuid."; exit 1; }
+luarocks install luasocket || { echo "ERROR: Failed to install luasocket."; exit 1; }
+luarocks install lua-resty-openssl || { echo "ERROR: Failed to install lua-resty-openssl."; exit 1; }
 
 echo "Removing unnecessary developer tooling"
 rm -fr openresty naxsi nginx-statsd luarocks
