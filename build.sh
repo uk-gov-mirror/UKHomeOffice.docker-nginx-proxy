@@ -45,7 +45,7 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Failed to download LuaRocks from $LUAROCKS_URL"
     exit 1
 fi
-tar xzvf luarocks.tar.gz --strip-components 1 -C luarocks/
+tar xzvf luarocks.tar.gz -C luarocks/
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to extract LuaRocks archive."
     exit 1
