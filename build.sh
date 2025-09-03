@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Script to install the openresty from source and to tidy up after...
 
 set -euo pipefail
 

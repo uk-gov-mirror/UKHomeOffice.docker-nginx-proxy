@@ -204,10 +204,11 @@ if [ "${CONCURRENT_CONNS_PER_IP}" != "" ]; then
         >>${NGIX_CONF_DIR}/nginx_rate_limits_${LOCATION_ID}.conf
     CONN_LIMITS="limit_conn connbuffer${LOCATION_ID} ${CONCURRENT_CONNS_PER_IP};"
 fi
-if [ "${DENY_COUNTRY_ON}" == "TRUE" ]; then
-    msg "Enabling GeoIP denies, unless IP is one of ${ALLOW_COUNTRY_CSV}, for location ${LOCATION_ID}."
-    DENY_COUNTRY="if (\$allowed_country = no) { return 403; }"
-fi
+# GeoIP country deny logic disabled as requested
+# if [ "${DENY_COUNTRY_ON}" == "TRUE" ]; then
+#     msg "Enabling GeoIP denies, unless IP is one of ${ALLOW_COUNTRY_CSV}, for location ${LOCATION_ID}."
+#     DENY_COUNTRY="if (\$allowed_country = no) { return 403; }"
+# fi
 
 # Now create the location specific include file.
 cat > /usr/local/openresty/nginx/conf/locations/${LOCATION_ID}.conf <<- EOF_LOCATION_CONF
@@ -236,3 +237,11 @@ location ${LOCATION} {
 
 }
 EOF_LOCATION_CONF
+
+# enable_location.sh logic commented out as requested
+# if [ -f /usr/local/openresty/nginx/conf/enabled/${LOCATION_ID}.conf ]; then
+#     msg "Location ${LOCATION_ID} already enabled!"
+# else
+#     msg "Enabling location ${LOCATION_ID}"
+#     ln -s /usr/local/openresty/nginx/conf/locations/${LOCATION_ID}.conf /usr/local/openresty/nginx/conf/enabled/${LOCATION_ID}.conf
+# fi
