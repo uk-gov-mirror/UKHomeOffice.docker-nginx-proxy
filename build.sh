@@ -54,7 +54,7 @@ rm luarocks.tar.gz
 # Move extracted files to luarocks/ if needed
 if [ -d "luarocks-3.12.0" ]; then
     mv luarocks-3.12.0/* luarocks/
-    rmdir luarocks-3.12.0
+    rm -rf luarocks-3.12.0
 fi
 if [ ! -d "luarocks" ] || [ -z "$(ls -A luarocks)" ]; then
     echo "ERROR: luarocks directory not created or is empty. Download or extraction failed."
