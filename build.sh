@@ -69,7 +69,7 @@ if [ -f "./naxsi/naxsi_rules/naxsi_core.rules" ]; then
 elif [ -f "./naxsi/naxsi_core.rules" ]; then
     cp "./naxsi/naxsi_core.rules" /usr/local/openresty/naxsi/
 else
-    wget -O /usr/local/openresty/naxsi/naxsi_core.rules https://raw.githubusercontent.com/nbs-system/naxsi/master/naxsi_core.rules
+    wget -O /usr/local/openresty/naxsi/naxsi_core.rules https://raw.githubusercontent.com/nbs-system/naxsi/master/naxsi_config/naxsi_core.rules
 fi
 
 echo "Installing luarocks"
