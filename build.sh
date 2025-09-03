@@ -58,7 +58,7 @@ if [ ! -d "luarocks" ] || [ -z "$(ls -A luarocks)" ]; then
     echo "ERROR: luarocks directory not created or is empty. Download or extraction failed."
     exit 1
 fi
-wget -qO - "$NAXSI_URL"        | tar xzv --strip-components 1 -C naxsi/
+wget -qO - "$NAXSI_URL"        | (mkdir -p naxsi && tar xzv --strip-components 1 -C naxsi/)
 wget -qO - "$STATSD_URL"       | tar xzv --strip-components 1 -C nginx-statsd/
  # ...existing code...
 
