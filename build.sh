@@ -45,12 +45,17 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Failed to download LuaRocks from $LUAROCKS_URL"
     exit 1
 fi
-tar xzvf luarocks.tar.gz -C luarocks/
+tar xzvf luarocks.tar.gz
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to extract LuaRocks archive."
     exit 1
 fi
 rm luarocks.tar.gz
+# Move extracted files to luarocks/ if needed
+if [ -d "luarocks-3.12.0" ]; then
+    mv luarocks-3.12.0/* luarocks/
+    rmdir luarocks-3.12.0
+fi
 if [ ! -d "luarocks" ] || [ -z "$(ls -A luarocks)" ]; then
     echo "ERROR: luarocks directory not created or is empty. Download or extraction failed."
     exit 1
