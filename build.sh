@@ -88,6 +88,12 @@ else
 fi
 
 echo "Installing LuaRocks..."
+if [ ! -d "luarocks" ] || [ -z "$(ls -A luarocks)" ]; then
+    echo "ERROR: luarocks directory not created or is empty before pushd. Download or extraction failed."
+    echo "Current directory contents:"
+    ls -l
+    exit 1
+fi
 pushd luarocks
 ./configure --with-lua=/usr/local/openresty/luajit \
                         --lua-suffix=jit-2.1 \
