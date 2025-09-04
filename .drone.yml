@@ -16,7 +16,7 @@ steps:
   - apk add curl bash wget tar
   - n=0; while [ "$n" -lt 60 ] && ! docker stats --no-stream > /dev/null 2>&1; do n=$(( n + 1 )); sleep 1; done
   - docker build --no-cache -t ngx:$${DRONE_BUILD_NUMBER} .
-  # - docker tag ngx:$${DRONE_BUILD_NUMBER}} ngx:latest
+  - docker tag ngx:$${DRONE_BUILD_NUMBER}} ngx:latest
   - ./ci-build.sh
 
   #   GEOIP_ACCOUNT_ID:
