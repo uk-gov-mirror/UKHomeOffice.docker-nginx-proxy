@@ -124,9 +124,9 @@ start_test "Start with minimal settings" "${STD_CMD} \
 echo "Test it's up and working..."
 curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 echo "Test limited protcol and SSL cipher... "
-docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -cipher 'AES256+EECDH' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
+docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ${TAG} -c "echo GET / | /usr/bin/openssl s_client -cipher 'AES256+EECDH' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
 echo "Test sslv2 not accepted...."
-if docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -ssl2 -connect ${INSTANCE}:10443" &> /dev/null; then
+if docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ${TAG} -c "echo GET / | /usr/bin/openssl s_client -ssl2 -connect ${INSTANCE}:10443" &> /dev/null; then
   echo "FAIL SSL defaults settings allow ssl2 ......"
   exit 2
 fi
@@ -192,7 +192,7 @@ start_test "Start with SSL CIPHER set and PROTOCOL" "${STD_CMD} \
            -e \"SSL_CIPHERS=DHE-RSA-AES256-SHA\" \
            -e \"SSL_PROTOCOLS=TLSv1.2\""
 echo "Test accepts defined protocol and cipher....."
-docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -cipher 'DHE-RSA-AES256-SHA' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
+docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ${TAG} -c "echo GET / | /usr/bin/openssl s_client -cipher 'DHE-RSA-AES256-SHA' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
 
 
 
