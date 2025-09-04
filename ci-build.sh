@@ -123,6 +123,11 @@ start_test "Start with minimal settings" "${STD_CMD} \
 
 echo "Test it's up and working..."
 curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
+# Ensure the container is running before link
+if ! docker ps --format '{{.Names}}' | grep -q "^${INSTANCE}$"; then
+  echo "Container ${INSTANCE} is not running. Starting it..."
+  docker start "${INSTANCE}"
+fi
 echo "Test limited protcol and SSL cipher... "
 docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ${TAG} -c "echo GET / | /usr/bin/openssl s_client -cipher 'AES256+EECDH' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
 echo "Test sslv2 not accepted...."
