@@ -74,16 +74,18 @@ function start_test() {
     echo "Running: $@ --name ${INSTANCE} -p ${PORT}:${HTTPS_LISTEN_PORT} ${TAG}"
     bash -c "$@ --name ${INSTANCE} -d -p ${PORT}:${HTTPS_LISTEN_PORT} ${TAG}"
     # Wait for container to be running
-    for i in {1..10}; do
-      if docker ps --format '{{.Names}}' | grep -q "^${INSTANCE}$"; then
-        break
-      fi
-      sleep 1
-    done
-    if ! docker ps --format '{{.Names}}' | grep -q "^${INSTANCE}$"; then
-      echo "Container ${INSTANCE} failed to start."
-      exit 1
+  for i in {1..10}; do
+    if docker ps --format '{{.Names}}' | grep -q "^${INSTANCE}$"; then
+      break
     fi
+    sleep 1
+  done
+  echo "Current running containers after start:"
+  docker ps
+  if ! docker ps --format '{{.Names}}' | grep -q "^${INSTANCE}$"; then
+    echo "Container ${INSTANCE} failed to start."
+    exit 1
+  fi
     # if files needed to be mounted in, the container stops immediately so start it again
     if [[ ${files} != "" ]]; then
       echo "${files}"
