@@ -117,7 +117,7 @@ echo "TESTING..."
 echo "=========="
 
 start_test "Start with minimal settings" "${STD_CMD} \
-           -e \"PROXY_SERVICE_HOST=https://www.w3.org\" \
+           -e \"PROXY_SERVICE_HOST=https://www.w3.org" \
            -e \"PROXY_SERVICE_PORT=443\""
 
 echo "Test it's up and working..."
