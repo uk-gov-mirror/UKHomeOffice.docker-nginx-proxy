@@ -3,15 +3,14 @@
 set -e
 
 TAG=ngx
-BUILD_NUMBER="${BUILD_NUMBER:-${DRONE_BUILD_NUMBER}}"
 PORT="${HTTPS_LISTEN_PORT:-10443}"
 BUILD_NUMBER="${BUILD_NUMBER:-local}"
 START_INSTANCE="docker run "
 DOCKER_HOST_NAME="localhost"
-MOCKSERVER="mockserver-${BUILD_NUMBER}"
-SLOWMOCKSERVER="slowmockserver-${BUILD_NUMBER}"
-MUTUAL_TLS="mutual-tls-${BUILD_NUMBER}"
-STANDARD_TLS="standard-tls-${BUILD_NUMBER}"
+MOCKSERVER="mockserver:latest"
+SLOWMOCKSERVER="slowmockserver:latest"
+MUTUAL_TLS="mutual-tls:latest"
+STANDARD_TLS="standard-tls:latest"
 MOCKSERVER_PORT=9000
 SLOWMOCKSERVER_PORT=9001
 WORKDIR="${PWD}"
@@ -36,7 +35,7 @@ function clean_up() {
     tear_down_container "${SLOWMOCKSERVER}"
     tear_down_container "${MUTUAL_TLS}"
     tear_down_container "${STANDARD_TLS}"
-    tear_down_container "${TAG}-${BUILD_NUMBER}"
+    tear_down_container "${TAG}:latest"
 }
 
 function add_files_to_container() {
@@ -56,7 +55,7 @@ function add_files_to_container() {
 }
 
 function start_test() {
-  INSTANCE="ngx-${BUILD_NUMBER}"
+  INSTANCE="ngx:latest"
     tear_down
     HTTPS_LISTEN_PORT=${HTTPS_LISTEN_PORT:-10443}
     echo ""
