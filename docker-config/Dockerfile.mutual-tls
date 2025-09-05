@@ -1,4 +1,5 @@
-FROM ngx
+ARG BUILD_NUMBER
+FROM ngx:${BUILD_NUMBER}
 
 COPY client_certs/ca.crt /etc/keys/client-ca
 
