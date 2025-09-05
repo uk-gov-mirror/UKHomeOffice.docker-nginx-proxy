@@ -262,7 +262,7 @@ curl -sk -o /dev/null \
      https://${DOCKER_HOST_NAME}:${PORT}/standards/
 
 echo "Test upstream client certs..."
-docker build --build-arg BUILD_NUMBER=${BUILD_NUMBER} -t mutual-tls:latest ${WORKDIR} -f docker-config/Dockerfile.mutual-tls
+docker build --build-arg BUILD_NUMBER=latest -t mutual-tls:latest ${WORKDIR} -f docker-config/Dockerfile.mutual-tls
 ${STD_CMD} -d \
            -e "HTTP_LISTEN_PORT=10081" \
            -e "HTTPS_LISTEN_PORT=10444" \
@@ -287,7 +287,7 @@ curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 tear_down_container "${MUTUAL_TLS}"
 
 echo "Test failure to verify upstream server cert..."
-docker build --build-arg BUILD_NUMBER=${BUILD_NUMBER} -t standard-tls:latest ${WORKDIR} -f docker-config/Dockerfile.standard-tls
+docker build --build-arg BUILD_NUMBER=latest -t standard-tls:latest ${WORKDIR} -f docker-config/Dockerfile.standard-tls
 ${STD_CMD} -d \
            -e "HTTP_LISTEN_PORT=10081" \
            -e "HTTPS_LISTEN_PORT=10444" \
