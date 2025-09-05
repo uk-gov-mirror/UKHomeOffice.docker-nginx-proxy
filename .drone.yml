@@ -14,10 +14,10 @@ steps:
   image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
   commands:
   - apk add curl bash wget tar
-  # - n=0; while [ "$n" -lt 60 ] && ! docker stats --no-stream > /dev/null 2>&1; do n=$(( n + 1 )); sleep 1; done
-  # - export BUILD_NUMBER=$${BUILD_NUMBER:-$${DRONE_BUILD_NUMBER}}
-  # - docker build --no-cache -t ngx:$${BUILD_NUMBER} .
-  # - docker tag ngx:$${BUILD_NUMBER} ngx:latest
+  - n=0; while [ "$n" -lt 60 ] && ! docker stats --no-stream > /dev/null 2>&1; do n=$(( n + 1 )); sleep 1; done
+  - export BUILD_NUMBER=$${BUILD_NUMBER:-$${DRONE_BUILD_NUMBER}}
+  - docker build --no-cache -t ngx:$${BUILD_NUMBER} .
+  - docker tag ngx:$${BUILD_NUMBER} ngx:latest
   - ./ci-build.sh
 
   #   GEOIP_ACCOUNT_ID:
