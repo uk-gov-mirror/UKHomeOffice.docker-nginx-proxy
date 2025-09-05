@@ -7,10 +7,10 @@ PORT="${HTTPS_LISTEN_PORT:-10443}"
 BUILD_NUMBER="${BUILD_NUMBER:-local}"
 START_INSTANCE="docker run "
 DOCKER_HOST_NAME="localhost"
-MOCKSERVER="mockserver:latest"
-SLOWMOCKSERVER="slowmockserver:latest"
-MUTUAL_TLS="mutual-tls:latest"
-STANDARD_TLS="standard-tls:latest"
+MOCKSERVER="mockserver"
+SLOWMOCKSERVER="slowmockserver"
+MUTUAL_TLS="mutual-tls"
+STANDARD_TLS="standard-tls"
 MOCKSERVER_PORT=9000
 SLOWMOCKSERVER_PORT=9001
 WORKDIR="${PWD}"
@@ -55,7 +55,7 @@ function add_files_to_container() {
 }
 
 function start_test() {
-  INSTANCE="ngx:latest"
+  INSTANCE="ngx"
     tear_down
     HTTPS_LISTEN_PORT=${HTTPS_LISTEN_PORT:-10443}
     echo ""
