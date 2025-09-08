@@ -119,6 +119,7 @@ echo "travis_fold:start:BUILD"
 echo "travis_fold:end:BUILD"
 
 echo "Running mocking-server..."
+docker rm -f mockserver 2>/dev/null || true
 docker build -t mockserver:latest ${WORKDIR} -f docker-config/Dockerfile.mockserver
 ${STD_CMD} -d \
            --name="${MOCKSERVER}" mockserver:latest \
