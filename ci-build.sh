@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+docker network create testnet || true
 set -e
 
 TAG=ngx
