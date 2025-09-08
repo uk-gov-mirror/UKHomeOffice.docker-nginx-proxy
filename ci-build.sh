@@ -125,7 +125,7 @@ ${STD_CMD} -d \
            -config=/test-servers.yaml \
            -debug \
            -port=${MOCKSERVER_PORT}
-docker run --rm "${MOCKSERVER}:${MOCKSERVER}" --network testnet martin/wait -c "${MOCKSERVER}:${MOCKSERVER_PORT}"
+docker run --rm --network testnet --name "${MOCKSERVER}" mockserver:latest martin/wait -c "${MOCKSERVER}:${MOCKSERVER_PORT}"
 
 echo "Running slow-mocking-server..."
 docker build -t slowmockserver:latest ${WORKDIR} -f docker-config/Dockerfile.slowmockserver
@@ -135,7 +135,7 @@ ${STD_CMD} -d \
            -monkeyConfig=/monkey-business.yaml \
            -debug \
            -port=${SLOWMOCKSERVER_PORT}
-docker run --rm "${SLOWMOCKSERVER}:${SLOWMOCKSERVER}" --network testnet martin/wait -c "${SLOWMOCKSERVER}:${SLOWMOCKSERVER_PORT}"
+docker run --rm --network testnet --name "${SLOWMOCKSERVER}" slowmockserver:latest martin/wait -c "${SLOWMOCKSERVER}:${SLOWMOCKSERVER_PORT}"
 
 echo "=========="
 echo "TESTING..."
