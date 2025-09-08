@@ -91,7 +91,7 @@ echo "========"
 echo "BUILD..."
 echo "========"
 echo "travis_fold:start:BUILD"
-docker build ${TAG} .
+docker build -t ${TAG} .
 echo "travis_fold:end:BUILD"
 
 echo "Running mocking-server..."
