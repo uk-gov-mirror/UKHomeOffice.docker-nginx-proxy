@@ -101,7 +101,17 @@ ${STD_CMD} -d \
            -config=/test-servers.yaml \
            -debug \
            -port=${MOCKSERVER_PORT}
-docker run --rm --network testnet martin/wait -c "${MOCKSERVER}:${MOCKSERVER_PORT}" -t 60
+for i in {1..60}; do
+  if curl -s --connect-timeout 1 "http://${MOCKSERVER}:${MOCKSERVER_PORT}/" >/dev/null; then
+    echo "${MOCKSERVER} is up"
+    break
+  fi
+  sleep 1
+  if [ "$i" -eq 60 ]; then
+    echo "Timeout waiting for ${MOCKSERVER}:${MOCKSERVER_PORT}"
+    exit 1
+  fi
+done
 
 echo "Running slow-mocking-server..."
 docker build -t slowmockserver:latest ${WORKDIR} -f docker-config/Dockerfile.slowmockserver
@@ -111,7 +121,17 @@ ${STD_CMD} -d \
            -monkeyConfig=/monkey-business.yaml \
            -debug \
            -port=${SLOWMOCKSERVER_PORT}
-docker run --rm --network testnet martin/wait -c "${SLOWMOCKSERVER}:${SLOWMOCKSERVER_PORT}" -t 60
+for i in {1..60}; do
+  if curl -s --connect-timeout 1 "http://${SLOWMOCKSERVER}:${SLOWMOCKSERVER_PORT}/" >/dev/null; then
+    echo "${SLOWMOCKSERVER} is up"
+    break
+  fi
+  sleep 1
+  if [ "$i" -eq 60 ]; then
+    echo "Timeout waiting for ${SLOWMOCKSERVER}:${SLOWMOCKSERVER_PORT}"
+    exit 1
+  fi
+done
 
 echo "=========="
 echo "TESTING..."
