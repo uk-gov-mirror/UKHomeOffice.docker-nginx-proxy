@@ -386,7 +386,7 @@ fi
 #clean_up
 #exit
 # -------------
-
+#trigger build
 start_test "Test custom error pages..." "${STD_CMD} \
            -e \"PROXY_SERVICE_HOST=http://${MOCKSERVER}\" \
            -e \"PROXY_SERVICE_PORT=${MOCKSERVER_PORT}\" \
