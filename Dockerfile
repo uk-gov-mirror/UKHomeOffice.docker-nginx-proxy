@@ -55,4 +55,4 @@ EXPOSE 10080 10443
 
 USER 1000
 
-ENTRYPOINT [ "/go.sh" ]
+ENTRYPOINT ["/bin/bash", "-c", "exec /go.sh"]
