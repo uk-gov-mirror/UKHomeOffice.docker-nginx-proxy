@@ -101,17 +101,7 @@ ${STD_CMD} -d \
            -config=/test-servers.yaml \
            -debug \
            -port=${MOCKSERVER_PORT}
-for i in {1..120}; do
-  if curl -s --connect-timeout 1 "http://${MOCKSERVER}:${MOCKSERVER_PORT}/" >/dev/null; then
-    echo "${MOCKSERVER} is up"
-    break
-  fi
-  sleep 1
-  if [ "$i" -eq 120 ]; then
-    echo "Timeout waiting for ${MOCKSERVER}:${MOCKSERVER_PORT}"
-    exit 1
-  fi
-done
+docker run --rm --link "${MOCKSERVER}:${MOCKSERVER}" martin/wait -c "${MOCKSERVER}:${MOCKSERVER_PORT}"
 
 echo "Running slow-mocking-server..."
 docker build -t slowmockserver:latest ${WORKDIR} -f docker-config/Dockerfile.slowmockserver
@@ -121,17 +111,7 @@ ${STD_CMD} -d \
            -monkeyConfig=/monkey-business.yaml \
            -debug \
            -port=${SLOWMOCKSERVER_PORT}
-for i in {1..120}; do
-  if curl -s --connect-timeout 1 "http://${SLOWMOCKSERVER}:${SLOWMOCKSERVER_PORT}/" >/dev/null; then
-    echo "${SLOWMOCKSERVER} is up"
-    break
-  fi
-  sleep 1
-  if [ "$i" -eq 120 ]; then
-    echo "Timeout waiting for ${SLOWMOCKSERVER}:${SLOWMOCKSERVER_PORT}"
-    exit 1
-  fi
-done
+docker run --rm --link "${SLOWMOCKSERVER}:${SLOWMOCKSERVER}" martin/wait -c "${SLOWMOCKSERVER}:${SLOWMOCKSERVER_PORT}"
 
 echo "=========="
 echo "TESTING..."
@@ -144,9 +124,9 @@ start_test "Start with minimal settings" "${STD_CMD} \
 echo "Test it's up and working..."
 curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 echo "Test limited protcol and SSL cipher... "
-docker run --network testnet --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -cipher 'AES256+EECDH' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
+docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -cipher 'AES256+EECDH' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
 echo "Test sslv2 not accepted...."
-if docker run --network testnet --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -ssl2 -connect ${INSTANCE}:10443" &> /dev/null; then
+if docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -ssl2 -connect ${INSTANCE}:10443" &> /dev/null; then
   echo "FAIL SSL defaults settings allow ssl2 ......"
   exit 2
 fi
@@ -157,7 +137,7 @@ start_test "Test enabling GEODB settings" "${STD_CMD} \
            -e \"DNSMASK=TRUE\" \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            -e \"ALLOW_COUNTRY_CSV=GB,FR,O1\" \
-           --network testnet "
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test GeoIP config isn't rejected..."
 curl --fail -s -v -k https://${DOCKER_HOST_NAME}:${PORT}/
 
@@ -169,7 +149,7 @@ start_test "Test GEODB settings can reject..." "${STD_CMD} \
            -e \"ALLOW_COUNTRY_CSV=CG\" \
            -e \"DENY_COUNTRY_ON=TRUE\" \
            -e \"ADD_NGINX_LOCATION_CFG=error_page 403 /nginx-proxy/50x.shtml;\" \
-           --network testnet "
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test GeoIP config IS rejected..."
 if ! curl -v -k -H "X-Forwarded-For: 8.8.8.8" https://${DOCKER_HOST_NAME}:${PORT}/ 2>&1 \/ | grep '403 Forbidden' ; then
   echo "We were expecting to be rejected with 403 error here - we are not in the Congo!"
@@ -186,7 +166,7 @@ start_test "Test rate limits 1 per second" "${STD_CMD} \
            -e \"REQS_PER_MIN_PER_IP=60\" \
            -e \"REQS_PER_PAGE=0\" \
            -e \"CONCURRENT_CONNS_PER_IP=1\" \
-           --network testnet "
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test two connections in the same second get blocked..."
 curl --fail -v -k https://${DOCKER_HOST_NAME}:${PORT}/
 if curl -v -k https://${DOCKER_HOST_NAME}:${PORT}/ 2>&1 \
@@ -205,7 +185,7 @@ start_test "Test multiple concurrent connections in the same second get blocked"
            -e \"REQS_PER_MIN_PER_IP=60\" \
            -e \"REQS_PER_PAGE=0\" \
            -e \"CONCURRENT_CONNS_PER_IP=1\" \
-           --network testnet "
+           --link \"${SLOWMOCKSERVER}:${SLOWMOCKSERVER}\" "
 echo "First background some requests..."
 curl -v -k https://${DOCKER_HOST_NAME}:${PORT} &>/dev/null &
 curl -v -k https://${DOCKER_HOST_NAME}:${PORT} &>/dev/null &
@@ -225,7 +205,7 @@ start_test "Test response has gzip" "${STD_CMD} \
            -e \"PROXY_SERVICE_PORT=${MOCKSERVER_PORT}\" \
            -e \"DNSMASK=TRUE\" \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
-           --network testnet "
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test gzip ok..."
 curl -s -I -X GET -k --compressed https://${DOCKER_HOST_NAME}:${PORT}/gzip | grep -q 'Content-Encoding: gzip'
 
@@ -235,7 +215,7 @@ start_test "Start with SSL CIPHER set and PROTOCOL" "${STD_CMD} \
            -e \"SSL_CIPHERS=DHE-RSA-AES256-SHA\" \
            -e \"SSL_PROTOCOLS=TLSv1.2\""
 echo "Test accepts defined protocol and cipher....."
-docker run --network testnet --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -cipher 'DHE-RSA-AES256-SHA' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
+docker run --link ${INSTANCE}:${INSTANCE} --rm --entrypoint bash ngx -c "echo GET / | /usr/bin/openssl s_client -cipher 'DHE-RSA-AES256-SHA' -tls1_2 -connect ${INSTANCE}:10443" &> /dev/null;
 
 
 
@@ -308,7 +288,7 @@ ${STD_CMD} -d \
            -e "PROXY_SERVICE_PORT=80" \
            -e "CLIENT_CERT_REQUIRED=TRUE" \
            -p 10444:10444 --name="${MUTUAL_TLS}" mutual-tls:latest
-docker run --rm --network testnet martin/wait -p 10444
+docker run --link "${MUTUAL_TLS}:${MUTUAL_TLS}" --rm martin/wait -p 10444
 
 start_test "Start with upstream client certs" \
            "${WORKDIR}/client_certs/client.crt" "upstream-client-crt" "/etc/keys/" \
@@ -318,7 +298,7 @@ start_test "Start with upstream client certs" \
            -e \"PROXY_SERVICE_PORT=10444\" \
            -e \"DNSMASK=TRUE\" \
            -e \"USE_UPSTREAM_CLIENT_CERT=TRUE\" \
-           --network testnet "
+           --link \"${MUTUAL_TLS}:${MUTUAL_TLS}\" "
 
 echo "Test it's up and working..."
 curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
@@ -332,7 +312,7 @@ ${STD_CMD} -d \
            -e "PROXY_SERVICE_HOST=http://www.w3.org" \
            -e "PROXY_SERVICE_PORT=80" \
            -p 10444:10444 --name="${STANDARD_TLS}" standard-tls:latest
-docker run --rm --network testnet martin/wait -p 10444
+docker run --link "${STANDARD_TLS}:${STANDARD_TLS}" --rm martin/wait -p 10444
 
 start_test "Start with failing upstream server verification" \
            "${WORKDIR}/client_certs/ca.crt" "upstream-server-ca" "/etc/keys/" \
@@ -341,7 +321,7 @@ start_test "Start with failing upstream server verification" \
            -e \"PROXY_SERVICE_PORT=10444\" \
            -e \"DNSMASK=TRUE\" \
            -e \"VERIFY_SERVER_CERT=TRUE\" \
-           --network testnet "
+           --link \"${STANDARD_TLS}:${STANDARD_TLS}\" "
 
 echo "Test it blocks the request, returning a 502..."
 if curl -ki https://${DOCKER_HOST_NAME}:${PORT}/ | grep "502 Bad Gateway" ; then
@@ -363,7 +343,7 @@ ${STD_CMD} -d \
            -e "PROXY_SERVICE_PORT=80" \
            -p 10444:10444 --name="${STANDARD_TLS}" ${TAG}
 docker start ${STANDARD_TLS}
-docker run --rm --network testnet martin/wait -p 10444
+docker run --link "${STANDARD_TLS}:${STANDARD_TLS}" --rm martin/wait -p 10444
 
 start_test "Start with succeeding upstream server verification" \
            "${WORKDIR}/client_certs/ca.crt" "upstream-server-ca" "/etc/keys/" \
@@ -372,7 +352,7 @@ start_test "Start with succeeding upstream server verification" \
            -e \"PROXY_SERVICE_PORT=10444\" \
            -e \"DNSMASK=TRUE\" \
            -e \"VERIFY_SERVER_CERT=TRUE\" \
-           --network testnet "
+           --link \"${STANDARD_TLS}:${STANDARD_TLS}\" "
 
 tear_down_container "${STANDARD_TLS}"
 
@@ -383,7 +363,7 @@ start_test "Start with Custom error pages redirect off" "${STD_CMD} \
            -e \"ERROR_REDIRECT_CODES_2=502\" \
            -e \"DNSMASK=TRUE\" \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
-           --network testnet "
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test All ok..."
 curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/api/
@@ -413,7 +393,7 @@ start_test "Test custom error pages..." "${STD_CMD} \
            -e \"DNSMASK=TRUE\" \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            -e \"ERROR_REDIRECT_CODES=502 404 500\" \
-           --network testnet "
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 if curl -k https://${DOCKER_HOST_NAME}:${PORT}/not-found | grep "404 Not Found" ; then
     if curl -k https://${DOCKER_HOST_NAME}:${PORT}/api/dead | grep "An error occurred" ; then
         echo "Passed custom error pages with ERROR_REDIRECT_CODES"
@@ -433,7 +413,7 @@ start_test "Start with Custom upload size" "${STD_CMD} \
            -e \"NAXSI_USE_DEFAULT_RULES=FALSE\" \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            -e \"DNSMASK=TRUE\" \
-           --network testnet "
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 dd if=/dev/urandom of=/tmp/file.txt bs=1048576 count=10
 
 echo "Upload a large file"
@@ -449,7 +429,7 @@ start_test "Start with listen for port 80" "${STD_CMD} \
            -e \"DNSMASK=TRUE\" \
            -e \"ENABLE_UUID_PARAM=FALSE\" \
            -e \"HTTPS_REDIRECT_PORT=${PORT}\" \
-           --network testnet "
+           --link \"${MOCKSERVER}:${MOCKSERVER}\" "
 echo "Test Redirect ok..."
 curl -s -o /dev/null http://${DOCKER_HOST_NAME}:8888/
 
