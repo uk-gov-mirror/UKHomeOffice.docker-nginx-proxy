@@ -120,6 +120,7 @@ echo "travis_fold:end:BUILD"
 
 echo "Running mocking-server..."
 docker rm -f mockserver 2>/dev/null || true
+docker rm -f mockserver 2>/dev/null || true
 docker build -t mockserver:latest ${WORKDIR} -f docker-config/Dockerfile.mockserver
 ${STD_CMD} -d \
            --name="${MOCKSERVER}" mockserver:latest \
@@ -129,6 +130,7 @@ ${STD_CMD} -d \
 docker run --rm --network testnet --name "${MOCKSERVER}" mockserver:latest martin/wait -c "${MOCKSERVER}:${MOCKSERVER_PORT}"
 
 echo "Running slow-mocking-server..."
+docker rm -f slowmockserver 2>/dev/null || true
 docker build -t slowmockserver:latest ${WORKDIR} -f docker-config/Dockerfile.slowmockserver
 ${STD_CMD} -d \
            --name="${SLOWMOCKSERVER}" slowmockserver:latest \
@@ -287,6 +289,7 @@ curl -sk -o /dev/null \
      https://${DOCKER_HOST_NAME}:${PORT}/standards/
 
 echo "Test upstream client certs..."
+docker rm -f mutual-tls 2>/dev/null || true
 docker build --build-arg BUILD_NUMBER=latest -t mutual-tls:latest ${WORKDIR} -f docker-config/Dockerfile.mutual-tls
 ${STD_CMD} -d \
            -e "HTTP_LISTEN_PORT=10081" \
@@ -312,6 +315,7 @@ curl -sk -o /dev/null https://${DOCKER_HOST_NAME}:${PORT}/
 tear_down_container "${MUTUAL_TLS}"
 
 echo "Test failure to verify upstream server cert..."
+docker rm -f standard-tls 2>/dev/null || true
 docker build --build-arg BUILD_NUMBER=latest -t standard-tls:latest ${WORKDIR} -f docker-config/Dockerfile.standard-tls
 ${STD_CMD} -d \
            -e "HTTP_LISTEN_PORT=10081" \
