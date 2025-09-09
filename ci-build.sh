@@ -114,11 +114,19 @@ docker run --rm --network testnet martin/wait -c "${MOCKSERVER}:${MOCKSERVER_POR
 echo "Running slow-mocking-server..."
 docker build -t slowmockserver:latest ${WORKDIR} -f docker-config/Dockerfile.slowmockserver
 ${STD_CMD} -d \
-           --name="${SLOWMOCKSERVER}" slowmockserver:latest \
+           --name="${SLOWMOCKSERVER}" --network testnet slowmockserver:latest \
            -config=/test-servers.yaml \
            -monkeyConfig=/monkey-business.yaml \
            -debug \
            -port=${SLOWMOCKSERVER_PORT}
+# Debug: Check container status and network before readiness check
+echo "--- Docker ps output (slowmockserver) ---"
+docker ps -a --filter "name=${SLOWMOCKSERVER}"
+echo "--- Docker inspect network (slowmockserver) ---"
+docker inspect ${SLOWMOCKSERVER} | grep testnet || true
+echo "--- Listening ports (slowmockserver) ---"
+docker exec ${SLOWMOCKSERVER} netstat -tln || true
+echo "--- End debug (slowmockserver) ---"
 # Wait for slowmockserver to be ready, with timeout and error handling
 MAX_WAIT=60
 WAITED=0
