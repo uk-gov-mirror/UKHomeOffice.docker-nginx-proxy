@@ -97,10 +97,18 @@ echo "travis_fold:end:BUILD"
 echo "Running mocking-server..."
 docker build -t mockserver:latest ${WORKDIR} -f docker-config/Dockerfile.mockserver
 ${STD_CMD} -d \
-           --name="${MOCKSERVER}" mockserver:latest \
+           --name="${MOCKSERVER}" --network testnet mockserver:latest \
            -config=/test-servers.yaml \
            -debug \
            -port=${MOCKSERVER_PORT}
+# Debug: Check container status and network before readiness check
+echo "--- Docker ps output ---"
+docker ps -a --filter "name=${MOCKSERVER}"
+echo "--- Docker inspect network ---"
+docker inspect ${MOCKSERVER} | grep testnet || true
+echo "--- Listening ports ---"
+docker exec ${MOCKSERVER} netstat -tln || true
+echo "--- End debug ---"
 docker run --rm --network testnet martin/wait -c "${MOCKSERVER}:${MOCKSERVER_PORT}"
 
 echo "Running slow-mocking-server..."
